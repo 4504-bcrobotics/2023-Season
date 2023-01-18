@@ -1,5 +1,15 @@
 
 #!/usr/bin/env python3
+
+"""
+#		    _/  _/    _/_/_/_/    _/    _/  _/   
+#		   _/  _/    _/        _/  _/  _/  _/    
+#		  _/_/_/_/  _/_/_/    _/  _/  _/_/_/_/   
+#		     _/          _/  _/  _/      _/      
+#		    _/    _/_/_/      _/        _/ 
+"""
+
+
 """
     This is a demo program showing the use of the RobotDrive class,
     specifically it contains the code necessary to operate a robot with
@@ -10,6 +20,9 @@ import wpilib
 import ctre
 # import rev
 
+"""Global Configuration Parameters"""
+INVERT_LEFT = False
+INVERT_RIGHT = True
 
 class MyRobot(wpilib.TimedRobot):
 
@@ -22,39 +35,64 @@ class MyRobot(wpilib.TimedRobot):
         # Start accelerometer using I2C attached to roborio
        # self.accelerometer = wpilib.ADXL345_I2C(wpilib.I2C.Port.kOnboard)
 
-        # object that handles basic drive operations
-        self.RightMotor1 = ctre.TalonSRX(1)
+        """Pigeon Configuration"""
+        self.imu = ctre.Pigeon2(11)
+        self.imu.configMountPose(ctre.AxisDirection.NegativeX, ctre.AxisDirection.PositiveZ)
+        
+        
+        """Motor Configuration"""
+        self.RightMotor = ctre.TalonSRX(1)
+        self.RightMotor.setInverted(INVERT_RIGHT)
         self.RightMotor2 = ctre.TalonSRX(2)
+        self.RightMotor2.setInverted(INVERT_RIGHT)
+        self.RightMotor2.follow(self.RightMotor)
         self.RightMotor3 = ctre.TalonSRX(3)
+        self.RightMotor3.setInverted(INVERT_RIGHT)
+        self.RightMotor3.follow(self.RightMotor)
 
-        self.LeftMotor4 = ctre.TalonSRX(4)
+        self.LeftMotor = ctre.TalonSRX(4)
+        self.LeftMotor.setInverted(INVERT_LEFT)
         self.LeftMotor5 = ctre.TalonSRX(5)
+        self.LeftMotor5.setInverted(INVERT_LEFT)
+        self.LeftMotor5.follow(self.LeftMotor)
         self.LeftMotor6 = ctre.TalonSRX(6)
+        self.LeftMotor6.setInverted(INVERT_LEFT)
+        self.LeftMotor6.follow(self.LeftMotor)
 
-
-        self.controller = None
-        self.flightStick = wpilib._wpilib.Joystick[0]
+        """User Controller Configuration"""
+        self.flightStickLeft = wpilib._wpilib.Joystick(0)
+        self.flightStickRight = wpilib._wpilib.Joystick(1)
         
     def autonomousInit(self) -> None:
-        self.RightMotor1.set(ctre._ctre.TalonSRXControlMode.PercentOutput, .2)
-        self.RightMotor2.set(ctre._ctre.TalonSRXControlMode.PercentOutput, .2)
-        self.RightMotor3.set(ctre._ctre.TalonSRXControlMode.PercentOutput, .2)
-        self.LeftMotor4.set(ctre._ctre.TalonSRXControlMode.PercentOutput, -.2)
-        self.LeftMotor5.set(ctre._ctre.TalonSRXControlMode.PercentOutput, -.2)
-        self.LeftMotor6.set(ctre._ctre.TalonSRXControlMode.PercentOutput, -.2)
+        self.RightMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, 0.2)
+        self.LeftMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, -0.2)
        
         return super().autonomousInit()
     
     def autonomousPeriodic(self) -> None:
+        heading = self.imu.getAbsoluteCompassHeading()
+        # heading = self.imu.getYaw()
+        # print(heading)
+        # error = (1 - heading)
+        # error = 0.5-heading/360
+        error = heading/360
+        self.RightMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, error)
+        self.LeftMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, error)
         return super().autonomousPeriodic()
 
     def teleopInit(self):
         """Executed at the start of teleop mode"""
         # self.controller = wpilib.PS4Controller(0)
-        self.myRobot.setSafetyEnabled(True)
+        # self.myRobot.setSafetyEnabled(True)
+        return False
 
     def teleopPeriodic(self) -> None:
-        a = 1
+        Yleft = self.flightStickLeft.getY()
+        Yright = self.flightStickRight.getY()
+        
+        self.RightMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Yright)
+        self.LeftMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Yleft)
+        
         # return super().teleopPeriodic()
     
     # def teleopPeriodic(self):
