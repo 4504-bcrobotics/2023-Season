@@ -18,6 +18,7 @@
 
 import wpilib
 import ctre
+import magicbot
 # import rev
 
 """Global Configuration Parameters"""
@@ -26,9 +27,9 @@ INVERT_RIGHT = True
 
 INTAKE_SPEED = 1.0
 
-class MyRobot(wpilib.TimedRobot):
+class MyRobot(magicbot.MagicRobot):
 
-    def robotInit(self):
+    def createObjects(self):
         """Robot initialization function"""
 
         # self.camera = wpilib.CameraServer
@@ -69,6 +70,8 @@ class MyRobot(wpilib.TimedRobot):
         """User Controller Configuration"""
         self.flightStickLeft = wpilib._wpilib.Joystick(0)
         self.flightStickRight = wpilib._wpilib.Joystick(1)
+        
+        pass
         
     def autonomousInit(self) -> None:
         self.RightMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, 0.2)
@@ -119,27 +122,27 @@ class MyRobot(wpilib.TimedRobot):
         # self.motor_drive_update()
 
 
-    def motor_drive_update(self, clampL = 0.25, clampR = 0.25, boost_enable = True):
-        """Runs the motors with arcade steering"""
+    # def motor_drive_update(self, clampL = 0.25, clampR = 0.25, boost_enable = True):
+    #     """Runs the motors with arcade steering"""
 
-        # Boost on both drive sides is enabled only when both bumpers are pressed simultaniously
-        if self.controller.getL1Button() and self.controller.getR1Button() and boost_enable:
-            clampL = 1.0
-            clampR = 1.0
+    #     # Boost on both drive sides is enabled only when both bumpers are pressed simultaniously
+    #     if self.controller.getL1Button() and self.controller.getR1Button() and boost_enable:
+    #         clampL = 1.0
+    #         clampR = 1.0
 
-        # Right Drive
-        Rightval = self.controller.getLeftY() * clampR
-        # Rightval = self.accelerometer.getX()
-        self.RightMotor1.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Rightval)
-        self.RightMotor2.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Rightval)
-        self.RightMotor3.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Rightval)
+    #     # Right Drive
+    #     Rightval = self.controller.getLeftY() * clampR
+    #     # Rightval = self.accelerometer.getX()
+    #     self.RightMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Rightval)
+    #     self.RightMotor2.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Rightval)
+    #     self.RightMotor3.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Rightval)
 
-        #Left Drive
-        Leftval = self.controller.getRightY() * -clampL
-        # Leftval = self.accelerometer.getY()
-        self.LeftMotor4.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Leftval)
-        self.LeftMotor5.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Leftval)
-        self.LeftMotor6.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Leftval)        
+    #     #Left Drive
+    #     Leftval = self.controller.getRightY() * -clampL
+    #     # Leftval = self.accelerometer.getY()
+    #     self.LeftMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Leftval)
+    #     self.LeftMotor5.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Leftval)
+    #     self.LeftMotor6.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Leftval)        
 
 if __name__ == "__main__":
 
