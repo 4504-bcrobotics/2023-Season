@@ -24,6 +24,8 @@ import ctre
 INVERT_LEFT = False
 INVERT_RIGHT = True
 
+INTAKE_SPEED = 1.0
+
 class MyRobot(wpilib.TimedRobot):
 
     def robotInit(self):
@@ -58,6 +60,11 @@ class MyRobot(wpilib.TimedRobot):
         self.LeftMotor6 = ctre.TalonSRX(6)
         self.LeftMotor6.setInverted(INVERT_LEFT)
         self.LeftMotor6.follow(self.LeftMotor)
+        
+        
+        """Intake Motor Configuration"""
+        self.intakeTop = ctre.TalonSRX(7)
+        self.intakeBottom = ctre.TalonSRX(8)
 
         """User Controller Configuration"""
         self.flightStickLeft = wpilib._wpilib.Joystick(0)
@@ -89,9 +96,22 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self) -> None:
         Yleft = self.flightStickLeft.getY()
         Yright = self.flightStickRight.getY()
+        RightTrigger = self.flightStickRight.getTrigger()
+        LeftTrigger = self.flightStickLeft.getTrigger()
         
         self.RightMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Yright)
-        self.LeftMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Yleft)
+        self.LeftMotor.set(ctre._ctre.TalonSRXControlMode.PercentOutput, Yleft *.4)
+        self.intakeTop.set(ctre._ctre.TalonSRXControlMode.PercentOutput, RightTrigger)
+        self.intakeBottom.set(ctre._ctre.TalonSRXControlMode.PercentOutput, RightTrigger)
+
+        if LeftTrigger:    
+            self.intakeBottom.set(ctre._ctre.TalonSRXControlMode.PercentOutput, INTAKE_SPEED)
+            self.intakeTop.set(ctre._ctre.TalonSRXControlMode.PercentOutput, INTAKE_SPEED)
+        if RightTrigger:
+            self.intakeBottom.set(ctre._ctre.TalonSRXControlMode.PercentOutput, -INTAKE_SPEED)
+            self.intakeTop.set(ctre._ctre.TalonSRXControlMode.PercentOutput, -INTAKE_SPEED)
+        
+        
         
         # return super().teleopPeriodic()
     
